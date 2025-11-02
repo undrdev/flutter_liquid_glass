@@ -81,10 +81,10 @@ class EdgeShinePainter extends CustomPainter {
       const Offset(0, 0),
       Offset(size.width, size.height),
       [
-        shineColor.withOpacity(intensity * 0.9 * bevelDepth), // Top-left
-        shineColor.withOpacity(intensity * 0.4 * bevelDepth),
-        shineColor.withOpacity(intensity * 0.15 * bevelDepth),
-        shineColor.withOpacity(intensity * 0.05 * bevelDepth),
+        shineColor.withOpacity(intensity * 1.2 * bevelDepth * 0.9), // Top-left
+        shineColor.withOpacity(intensity * 0.8 * bevelDepth * 0.4),
+        shineColor.withOpacity(intensity * 0.6 * bevelDepth * 0.15),
+        shineColor.withOpacity(intensity * 0.4 * bevelDepth * 0.05),
         shineColor.withOpacity(0),
       ],
       [0.0, 0.25, 0.5, 0.75, 1.0],
@@ -92,7 +92,7 @@ class EdgeShinePainter extends CustomPainter {
 
     paint
       ..shader = gradient
-      ..strokeWidth = bevelWidthPixels * 2;
+      ..strokeWidth = bevelWidthPixels * 3;
 
     // Draw subtle outer edge
     canvas.drawRRect(rrect, paint);
@@ -105,19 +105,22 @@ class EdgeShinePainter extends CustomPainter {
       Canvas canvas, RRect rrect, Size size, double bevelWidthPixels) {
     final paint = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = bevelWidthPixels
       ..blendMode = BlendMode.screen;
 
-    // Top edge - brightest
-    paint.color = shineColor.withOpacity(intensity * 0.8);
+    // Top edge - brightest, thicker
+    paint
+      ..color = shineColor.withOpacity(intensity * 0.5)
+      ..strokeWidth = bevelWidthPixels * 1.5;
     canvas.drawLine(
       Offset(rrect.left, rrect.top + bevelWidthPixels / 2),
       Offset(rrect.right, rrect.top + bevelWidthPixels / 2),
       paint,
     );
 
-    // Left edge - bright
-    paint.color = shineColor.withOpacity(intensity * 0.6);
+    // Left edge - bright, thicker
+    paint
+      ..color = shineColor.withOpacity(intensity * 0.4)
+      ..strokeWidth = bevelWidthPixels * 1.5;
     canvas.drawLine(
       Offset(rrect.left + bevelWidthPixels / 2, rrect.top),
       Offset(rrect.left + bevelWidthPixels / 2, rrect.bottom),
