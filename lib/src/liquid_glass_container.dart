@@ -6,7 +6,7 @@ import 'package:flutter_liquid_glass/src/edge_shine_painter.dart';
 ///
 /// This is the core building block for all Liquid Glass widgets. It combines
 /// backdrop blur, background tint, and optional edge shine effects to create
-/// the characteristic liquid glass appearance.
+/// the characteristic liquid glass appearance based on Apple's design system.
 ///
 /// Example:
 /// ```dart
@@ -21,7 +21,7 @@ class LiquidGlassContainer extends StatelessWidget {
   /// The child widget to display inside the container.
   final Widget child;
 
-  /// The intensity of the blur effect. Defaults to 15.0.
+  /// The intensity of the blur effect. Defaults to 20.0.
   ///
   /// Higher values create a stronger blur effect. Recommended range: 5-30.
   final double blurIntensity;
@@ -44,10 +44,22 @@ class LiquidGlassContainer extends StatelessWidget {
   /// Whether to enable edge shine effect. Defaults to true.
   final bool edgeShine;
 
-  /// The intensity of the edge shine effect. Defaults to 0.3.
+  /// The intensity of the edge shine effect. Defaults to 0.5.
   ///
   /// Range: 0.0 to 1.0. Higher values create more pronounced shine.
   final double edgeShineIntensity;
+
+  /// Bevel depth - additional depth effect at the edge (0-1). Defaults to 0.08.
+  final double bevelDepth;
+
+  /// Bevel width - width of the bevel zone (0-1). Defaults to 0.15.
+  final double bevelWidth;
+
+  /// Enable specular highlights (animated light reflections). Defaults to true.
+  final bool specular;
+
+  /// Adds a soft drop-shadow under the pane. Defaults to true.
+  final bool shadow;
 
   /// The padding inside the container.
   final EdgeInsetsGeometry? padding;
@@ -70,14 +82,18 @@ class LiquidGlassContainer extends StatelessWidget {
   const LiquidGlassContainer({
     super.key,
     required this.child,
-    this.blurIntensity = 15.0,
+    this.blurIntensity = 20.0,
     this.tintColor = const Color.fromRGBO(255, 255, 255, 0.1),
     this.borderColor,
     this.borderWidth = 1.0,
     this.borderGradient,
     this.borderRadius = const BorderRadius.all(Radius.circular(20)),
     this.edgeShine = true,
-    this.edgeShineIntensity = 0.3,
+    this.edgeShineIntensity = 0.5,
+    this.bevelDepth = 0.08,
+    this.bevelWidth = 0.15,
+    this.specular = true,
+    this.shadow = true,
     this.padding,
     this.margin,
     this.width,
@@ -88,13 +104,23 @@ class LiquidGlassContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    Widget content = Container(
       width: width,
       height: height,
       margin: margin,
       decoration: BoxDecoration(
         borderRadius: borderRadius,
         border: _buildBorder(),
+        boxShadow: shadow
+            ? [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 20,
+                  offset: const Offset(0, 4),
+                  spreadRadius: 0,
+                ),
+              ]
+            : null,
       ),
       child: ClipRRect(
         borderRadius: borderRadius,
@@ -124,6 +150,10 @@ class LiquidGlassContainer extends StatelessWidget {
                   painter: EdgeShinePainter(
                     borderRadius: borderRadius,
                     intensity: edgeShineIntensity,
+                    bevelDepth: bevelDepth,
+                    bevelWidth: bevelWidth,
+                    specular: specular,
+                    time: 0.0, // Static for now
                   ),
                 ),
               ),
@@ -146,6 +176,8 @@ class LiquidGlassContainer extends StatelessWidget {
         ),
       ),
     );
+
+    return content;
   }
 
   Border? _buildBorder() {

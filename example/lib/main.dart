@@ -56,7 +56,8 @@ class DemoHome extends StatelessWidget {
                     bottomLeft: Radius.circular(20),
                     bottomRight: Radius.circular(20),
                   ),
-                  edgeShine: false,
+                  edgeShine: true,
+                  shadow: false,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20,
