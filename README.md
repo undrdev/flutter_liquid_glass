@@ -121,7 +121,7 @@ Based on [Apple Liquid Glass documentation](https://developer.apple.com/document
 
 ## Contributing
 
-Contributions are welcome! Please read our contributing guidelines and submit pull requests to our repository.
+Contributions are welcome! Please read our contributing guidelines and submit pull requests to our [repository](https://github.com/undrdev/flutter_liquid_glass).
 
 ## License
 
