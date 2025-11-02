@@ -103,34 +103,64 @@ class EdgeShinePainter extends CustomPainter {
 
   void _drawBrightEdges(
       Canvas canvas, RRect rrect, Size size, double bevelWidthPixels) {
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..blendMode = BlendMode.screen;
+    final highlightPath = Path()..addRRect(rrect);
 
-    // Top edge - brightest, thicker
-    paint
-      ..color = shineColor.withOpacity(intensity * 0.5)
-      ..strokeWidth = bevelWidthPixels * 1.5;
-    canvas.drawLine(
-      Offset(rrect.left, rrect.top + bevelWidthPixels / 2),
-      Offset(rrect.right, rrect.top + bevelWidthPixels / 2),
-      paint,
+    canvas.save();
+    canvas.clipPath(highlightPath);
+
+    // Top highlight band
+    final topHeight = bevelWidthPixels * 1.2;
+    final topRect = Rect.fromLTWH(
+      rrect.left,
+      rrect.top,
+      rrect.width,
+      topHeight,
     );
 
-    // Left edge - bright, thicker
-    paint
-      ..color = shineColor.withOpacity(intensity * 0.4)
-      ..strokeWidth = bevelWidthPixels * 1.5;
-    canvas.drawLine(
-      Offset(rrect.left + bevelWidthPixels / 2, rrect.top),
-      Offset(rrect.left + bevelWidthPixels / 2, rrect.bottom),
-      paint,
+    final topPaint = Paint()
+      ..blendMode = BlendMode.screen
+      ..shader = ui.Gradient.linear(
+        topRect.topCenter,
+        topRect.bottomCenter,
+        [
+          shineColor.withOpacity(intensity * 0.75),
+          shineColor.withOpacity(0.0),
+        ],
+      );
+    canvas.drawRect(topRect, topPaint);
+
+    // Left highlight band
+    final leftWidth = bevelWidthPixels * 1.2;
+    final leftRect = Rect.fromLTWH(
+      rrect.left,
+      rrect.top,
+      leftWidth,
+      rrect.height,
     );
+
+    final leftPaint = Paint()
+      ..blendMode = BlendMode.screen
+      ..shader = ui.Gradient.linear(
+        leftRect.centerLeft,
+        leftRect.centerRight,
+        [
+          shineColor.withOpacity(intensity * 0.55),
+          shineColor.withOpacity(0.0),
+        ],
+      );
+    canvas.drawRect(leftRect, leftPaint);
+
+    canvas.restore();
 
     // Top-left corner highlight
     if (rrect.tlRadius.x > 0) {
       _drawCornerHighlight(
-          canvas, rrect.left, rrect.top, rrect.tlRadius.x, intensity * 0.6);
+        canvas,
+        rrect.left,
+        rrect.top,
+        rrect.tlRadius.x,
+        intensity * 0.6,
+      );
     }
   }
 
