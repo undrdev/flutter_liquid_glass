@@ -92,46 +92,58 @@ class LiquidGlassContainer extends StatelessWidget {
       width: width,
       height: height,
       margin: margin,
-      clipBehavior: clipBehavior,
-      alignment: alignment,
       decoration: BoxDecoration(
         borderRadius: borderRadius,
         border: _buildBorder(),
       ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Glass effect layer
-          ClipRRect(
-            borderRadius: borderRadius,
-            child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: blurIntensity,
-                sigmaY: blurIntensity,
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: tintColor,
+      child: ClipRRect(
+        borderRadius: borderRadius,
+        clipBehavior: clipBehavior,
+        child: Stack(
+          children: [
+            // Glass effect layer
+            ClipRRect(
+              borderRadius: borderRadius,
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: blurIntensity,
+                  sigmaY: blurIntensity,
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: tintColor,
+                  ),
                 ),
               ),
             ),
-          ),
 
-          // Edge shine effect
-          if (edgeShine)
-            CustomPaint(
-              painter: EdgeShinePainter(
-                borderRadius: borderRadius,
-                intensity: edgeShineIntensity,
+            // Edge shine effect
+            if (edgeShine)
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: EdgeShinePainter(
+                    borderRadius: borderRadius,
+                    intensity: edgeShineIntensity,
+                  ),
+                ),
               ),
-            ),
 
-          // Content
-          Padding(
-            padding: padding ?? EdgeInsets.zero,
-            child: child,
-          ),
-        ],
+            // Content
+            if (alignment != null)
+              Align(
+                alignment: alignment!,
+                child: Padding(
+                  padding: padding ?? EdgeInsets.zero,
+                  child: child,
+                ),
+              )
+            else
+              Padding(
+                padding: padding ?? EdgeInsets.zero,
+                child: child,
+              ),
+          ],
+        ),
       ),
     );
   }
