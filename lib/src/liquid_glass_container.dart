@@ -1,6 +1,10 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_liquid_glass/src/edge_shine_painter.dart';
+
+import 'lens/liquid_glass_lens.dart';
+import 'lens/liquid_glass_scope.dart';
 
 /// A container widget that provides a glassmorphic effect with blur, tint, and edge shine.
 ///
@@ -79,6 +83,12 @@ class LiquidGlassContainer extends StatelessWidget {
   /// The alignment of the child widget.
   final AlignmentGeometry? alignment;
 
+  /// Refraction strength for the shader lens when available.
+  final double refractionStrength;
+
+  /// Magnification factor for the shader lens.
+  final double magnification;
+
   const LiquidGlassContainer({
     super.key,
     required this.child,
@@ -100,10 +110,15 @@ class LiquidGlassContainer extends StatelessWidget {
     this.height,
     this.clipBehavior = Clip.antiAlias,
     this.alignment,
+    this.refractionStrength = 0.045,
+    this.magnification = 1.025,
   });
 
   @override
   Widget build(BuildContext context) {
+    final scopeController = LiquidGlassScope.maybeOf(context);
+    final useLens = scopeController != null && scopeController.program != null;
+
     Widget content = Container(
       width: width,
       height: height,
@@ -125,54 +140,163 @@ class LiquidGlassContainer extends StatelessWidget {
       child: ClipRRect(
         borderRadius: borderRadius,
         clipBehavior: clipBehavior,
-        child: Stack(
-          children: [
-            // Glass effect layer
-            ClipRRect(
-              borderRadius: borderRadius,
-              child: BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: blurIntensity,
-                  sigmaY: blurIntensity,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final width = constraints.maxWidth.isFinite
+                ? constraints.maxWidth
+                : constraints.constrainWidth();
+            final height = constraints.maxHeight.isFinite
+                ? constraints.maxHeight
+                : constraints.constrainHeight();
+
+            final glowWidth = width > 0 ? width * 0.75 : width;
+            final glowHeight = height > 0 ? height * 0.75 : height;
+            final shadowWidth = width > 0 ? width * 0.85 : width;
+            final shadowHeight = height > 0 ? height * 0.85 : height;
+
+            return Stack(
+              children: [
+                // Glass effect layer
+                Positioned.fill(
+                  child: useLens
+                      ? LiquidGlassLens(
+                          borderRadius: borderRadius,
+                          refraction: refractionStrength,
+                          magnification: magnification,
+                        )
+                      : ClipRRect(
+                          borderRadius: borderRadius,
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(
+                              sigmaX: blurIntensity,
+                              sigmaY: blurIntensity,
+                            ),
+                            child: const SizedBox.expand(),
+                          ),
+                        ),
                 ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: tintColor,
+
+                // Tint overlay
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: borderRadius,
+                      color: tintColor,
+                    ),
                   ),
                 ),
-              ),
-            ),
 
-            // Edge shine effect
-            if (edgeShine)
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: EdgeShinePainter(
-                    borderRadius: borderRadius,
-                    intensity: edgeShineIntensity,
-                    bevelDepth: bevelDepth,
-                    bevelWidth: bevelWidth,
-                    specular: specular,
-                    time: 0.0, // Static for now
+                // Highlight overlay - soft glow on top-left
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.white.withOpacity(0.35),
+                          Colors.white.withOpacity(0.08),
+                          Colors.white.withOpacity(0.0),
+                        ],
+                        stops: const [0.0, 0.4, 1.0],
+                      ),
+                    ),
                   ),
                 ),
-              ),
 
-            // Content
-            if (alignment != null)
-              Align(
-                alignment: alignment!,
-                child: Padding(
-                  padding: padding ?? EdgeInsets.zero,
-                  child: child,
+                // Subtle shadow overlay - depth towards bottom-right
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.14),
+                        ],
+                        stops: const [0.55, 1.0],
+                      ),
+                    ),
+                  ),
                 ),
-              )
-            else
-              Padding(
-                padding: padding ?? EdgeInsets.zero,
-                child: child,
-              ),
-          ],
+
+                // Radial glow from top-left corner
+                if (width.isFinite && height.isFinite)
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    width: glowWidth,
+                    height: glowHeight,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: RadialGradient(
+                          center: Alignment.topLeft,
+                          radius: 1.1,
+                          colors: [
+                            Colors.white.withOpacity(0.28),
+                            Colors.white.withOpacity(0.0),
+                          ],
+                          stops: const [0.0, 1.0],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // Radial shadow from bottom-right corner for depth
+                if (width.isFinite && height.isFinite)
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    width: shadowWidth,
+                    height: shadowHeight,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: RadialGradient(
+                          center: Alignment.bottomRight,
+                          radius: 1.1,
+                          colors: [
+                            Colors.black.withOpacity(0.2),
+                            Colors.black.withOpacity(0.0),
+                          ],
+                          stops: const [0.0, 1.0],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // Edge shine effect
+                if (edgeShine)
+                  Positioned.fill(
+                    child: CustomPaint(
+                      painter: EdgeShinePainter(
+                        borderRadius: borderRadius,
+                        intensity: edgeShineIntensity,
+                        bevelDepth: bevelDepth,
+                        bevelWidth: bevelWidth,
+                        specular: specular,
+                        time: 0.0,
+                      ),
+                    ),
+                  ),
+
+                // Content
+                if (alignment != null)
+                  Align(
+                    alignment: alignment!,
+                    child: Padding(
+                      padding: padding ?? EdgeInsets.zero,
+                      child: child,
+                    ),
+                  )
+                else
+                  Padding(
+                    padding: padding ?? EdgeInsets.zero,
+                    child: child,
+                  ),
+              ],
+            );
+          },
         ),
       ),
     );

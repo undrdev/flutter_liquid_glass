@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_liquid_glass/flutter_liquid_glass.dart';
 
+import 'backgrounds/liquid_background.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -23,7 +25,9 @@ class MyApp extends StatelessWidget {
           ),
         ],
       ),
-      home: const DemoHome(),
+      home: LiquidGlassScope(
+        child: const DemoHome(),
+      ),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -35,18 +39,7 @@ class DemoHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.deepPurple.shade300,
-              Colors.blue.shade300,
-              Colors.pink.shade300,
-            ],
-          ),
-        ),
+      body: LiquidBackground(
         child: SafeArea(
           child: CustomScrollView(
             slivers: [

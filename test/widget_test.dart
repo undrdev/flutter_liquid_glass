@@ -238,8 +238,8 @@ void main() {
               builder: (context) => TextButton(
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const LiquidGlassSnackBar(
-                      content: Text('Snackbar'),
+                    LiquidGlassSnackBar(
+                      content: const Text('Snackbar'),
                     ),
                   );
                 },

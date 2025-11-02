@@ -27,3 +27,6 @@ export 'src/widgets/liquid_glass_snackbar.dart';
 
 // Theme
 export 'src/liquid_glass_theme.dart';
+
+// Shader-based lens and scope
+export 'src/lens/liquid_glass_scope.dart';

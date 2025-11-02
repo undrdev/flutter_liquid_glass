@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_liquid_glass/src/liquid_glass_container.dart';
 
 /// A SnackBar with liquid glass effect and slide-in animation.
 ///
@@ -14,46 +15,112 @@ import 'package:flutter/material.dart';
 /// );
 /// ```
 class LiquidGlassSnackBar extends SnackBar {
-  /// The blur intensity. Defaults to 20.0.
-  final double blurIntensity;
-
-  /// The tint color. Defaults to white with 15% opacity.
-  final Color tintColor;
-
-  /// The edge shine intensity. Defaults to 0.3.
-  final double edgeShineIntensity;
-
-  /// Border radius for the snackbar.
-  final BorderRadius? borderRadius;
-
-  /// Whether to show edge shine.
-  final bool edgeShine;
-
-  const LiquidGlassSnackBar({
+  LiquidGlassSnackBar({
     super.key,
-    required super.content,
-    super.duration = const Duration(seconds: 4),
-    super.action,
-    super.margin = const EdgeInsets.all(8),
-    super.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-    this.blurIntensity = 20.0,
-    this.tintColor = const Color.fromRGBO(255, 255, 255, 0.15),
-    this.edgeShineIntensity = 0.3,
-    this.borderRadius,
-    this.edgeShine = true,
-    super.onVisible,
-    super.dismissDirection = DismissDirection.down,
-    super.behavior = SnackBarBehavior.floating,
+    required Widget content,
+    SnackBarAction? action,
+    Duration duration = const Duration(seconds: 4),
+    EdgeInsetsGeometry margin = const EdgeInsets.all(12),
+    double blurIntensity = 22.0,
+    Color tintColor = const Color.fromRGBO(255, 255, 255, 0.16),
+    double edgeShineIntensity = 0.45,
+    bool edgeShine = true,
+    BorderRadius borderRadius = const BorderRadius.all(Radius.circular(18)),
+    EdgeInsetsGeometry padding = const EdgeInsets.symmetric(
+      horizontal: 20,
+      vertical: 16,
+    ),
+    VoidCallback? onVisible,
+    DismissDirection dismissDirection = DismissDirection.down,
+    SnackBarBehavior behavior = SnackBarBehavior.floating,
   }) : super(
+          content: _GlassSnackBarContent(
+            content: content,
+            action: action,
+            blurIntensity: blurIntensity,
+            tintColor: tintColor,
+            edgeShineIntensity: edgeShineIntensity,
+            edgeShine: edgeShine,
+            borderRadius: borderRadius,
+            padding: padding,
+          ),
+          duration: duration,
+          margin: margin,
+          padding: EdgeInsets.zero,
           backgroundColor: Colors.transparent,
           elevation: 0,
+          behavior: behavior,
+          dismissDirection: dismissDirection,
+          onVisible: onVisible,
         );
+}
+
+class _GlassSnackBarContent extends StatelessWidget {
+  final Widget content;
+  final SnackBarAction? action;
+  final double blurIntensity;
+  final Color tintColor;
+  final double edgeShineIntensity;
+  final bool edgeShine;
+  final BorderRadius borderRadius;
+  final EdgeInsetsGeometry padding;
+
+  const _GlassSnackBarContent({
+    required this.content,
+    required this.action,
+    required this.blurIntensity,
+    required this.tintColor,
+    required this.edgeShineIntensity,
+    required this.edgeShine,
+    required this.borderRadius,
+    required this.padding,
+  });
 
   @override
-  // ignore: overridden_fields
-  ShapeBorder? get shape => RoundedRectangleBorder(
-        borderRadius: borderRadius ?? BorderRadius.circular(12),
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.snackBarTheme.contentTextStyle?.color ??
+        theme.colorScheme.onSurface;
+
+    Widget actionWidget = const SizedBox.shrink();
+    if (action != null) {
+      actionWidget = Padding(
+        padding: const EdgeInsets.only(left: 16),
+        child: SnackBarAction(
+          label: action!.label,
+          onPressed: action!.onPressed,
+          textColor: action!.textColor,
+          disabledTextColor: action!.disabledTextColor,
+        ),
       );
+    }
+
+    return LiquidGlassContainer(
+      blurIntensity: blurIntensity,
+      tintColor: tintColor,
+      edgeShineIntensity: edgeShineIntensity,
+      edgeShine: edgeShine,
+      borderRadius: borderRadius,
+      padding: padding,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Flexible(
+            child: DefaultTextStyle.merge(
+              style: TextStyle(
+                color: textColor,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+              child: content,
+            ),
+          ),
+          if (action != null) actionWidget,
+        ],
+      ),
+    );
+  }
 }
 
 /// Shows a liquid glass snackbar.

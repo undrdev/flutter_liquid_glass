@@ -46,7 +46,25 @@ Then run:
 flutter pub get
 ```
 
-## Usage
+## Getting Started
+
+Liquid glass refraction relies on a shader-backed capture of the scene. Wrap the portion of your app that should allow glass refraction with `LiquidGlassScope`:
+
+```dart
+void main() {
+  runApp(
+    MaterialApp(
+      home: LiquidGlassScope(
+        child: MyHomePage(),
+      ),
+    ),
+  );
+}
+```
+
+All `LiquidGlass*` widgets automatically fall back to the blur-only implementation if the scope is absent, but wrapping with `LiquidGlassScope` enables the fluid, water-like distortion inspired by Apple.
+
+Check out the [Quick Start Guide](QUICKSTART.md) to get up and running in 5 minutes! For detailed documentation, see the sections below.
 
 ### Quick Start
 
@@ -71,6 +89,8 @@ ScaffoldMessenger.of(context).showSnackBar(
   ),
 )
 ```
+
+> Tip: Place these widgets inside a `LiquidGlassScope` to enable the refractive shader lens.
 
 ### Custom Configuration
 

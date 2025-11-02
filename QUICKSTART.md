@@ -24,7 +24,21 @@ flutter pub get
 import 'package:flutter_liquid_glass/flutter_liquid_glass.dart';
 ```
 
-### 2. Add a Background
+### 2. Wrap Your App with `LiquidGlassScope`
+
+To enable shader-based refraction, wrap the portion of your widget tree where liquid glass components live with `LiquidGlassScope`:
+
+```dart
+MaterialApp(
+  home: LiquidGlassScope(
+    child: MyHomePage(),
+  ),
+);
+```
+
+`LiquidGlassScope` captures the scene behind your widgets each frame so the shader can refract it.
+
+### 3. Add a Background
 
 Liquid Glass works best with a colorful background. Add a gradient:
 
@@ -45,7 +59,7 @@ Container(
 )
 ```
 
-### 3. Create Glass Components
+### 4. Create Glass Components
 
 #### Glass Card
 
@@ -188,7 +202,9 @@ class MyApp extends StatelessWidget {
           ),
         ],
       ),
-      home: MyHomePage(),
+      home: LiquidGlassScope(
+        child: MyHomePage(),
+      ),
     );
   }
 }
@@ -258,8 +274,9 @@ class MyHomePage extends StatelessWidget {
 1. **Use colorful backgrounds** - Glass effects work best over gradients or images
 2. **Adjust blur intensity** - Higher values (20-30) for stronger effects, lower (5-10) for subtle
 3. **Layer components** - Stack glass elements for depth
-4. **Accessibility** - The theme respects user preferences
-5. **Performance** - Use `RepaintBoundary` for complex layouts
+4. **Wrap with `LiquidGlassScope`** - Without it, widgets fall back to simple blurs
+5. **Accessibility** - The theme respects user preferences
+6. **Performance** - Use `RepaintBoundary` for complex layouts
 
 ## Troubleshooting
 
