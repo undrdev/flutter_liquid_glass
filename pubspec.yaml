@@ -1,8 +1,8 @@
 name: flutter_liquid_glass
 description: "A Flutter package implementing Apple's Liquid Glass design system with glassmorphic effects, edge shine, physics-based animations, and touch interactions."
 version: 0.1.0
-homepage: https://github.com/yourusername/flutter_liquid_glass
-repository: https://github.com/yourusername/flutter_liquid_glass
+homepage: https://github.com/undrdev/flutter_liquid_glass
+repository: https://github.com/undrdev/flutter_liquid_glass
 
 environment:
   sdk: ^3.0.0
