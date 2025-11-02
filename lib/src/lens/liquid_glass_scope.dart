@@ -7,21 +7,28 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 
 class LiquidGlassScope extends StatefulWidget {
-  const LiquidGlassScope({super.key, required this.child, this.captureScale = 0.6, this.captureFps = 30});
+  const LiquidGlassScope(
+      {super.key,
+      required this.child,
+      this.captureScale = 0.6,
+      this.captureFps = 30});
 
   final Widget child;
   final double captureScale;
   final double captureFps;
 
   static LiquidGlassScopeController? maybeOf(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<_LiquidGlassScopeInherited>()?.controller;
+    return context
+        .dependOnInheritedWidgetOfExactType<_LiquidGlassScopeInherited>()
+        ?.controller;
   }
 
   @override
   State<LiquidGlassScope> createState() => _LiquidGlassScopeState();
 }
 
-class _LiquidGlassScopeState extends State<LiquidGlassScope> with SingleTickerProviderStateMixin {
+class _LiquidGlassScopeState extends State<LiquidGlassScope>
+    with SingleTickerProviderStateMixin {
   final GlobalKey _boundaryKey = GlobalKey();
   late final LiquidGlassScopeController _controller;
   late final Ticker _ticker;
@@ -40,7 +47,9 @@ class _LiquidGlassScopeState extends State<LiquidGlassScope> with SingleTickerPr
   }
 
   Future<void> _loadShader() async {
-    final program = await ui.FragmentProgram.fromAsset('assets/shaders/liquid_glass.frag');
+    final program = await ui.FragmentProgram.fromAsset(
+      'packages/flutter_liquid_glass/assets/shaders/liquid_glass.frag',
+    );
     if (!mounted) return;
     setState(() {
       _program = program;
@@ -70,14 +79,17 @@ class _LiquidGlassScopeState extends State<LiquidGlassScope> with SingleTickerPr
   }
 
   Future<void> _capture() async {
-    final boundary = _boundaryKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+    final boundary = _boundaryKey.currentContext?.findRenderObject()
+        as RenderRepaintBoundary?;
     if (boundary == null || boundary.debugNeedsPaint) {
       _scheduleCapture();
       return;
     }
     _capturing = true;
     try {
-      final pixelRatio = (MediaQuery.maybeOf(context)?.devicePixelRatio ?? ui.window.devicePixelRatio) * widget.captureScale;
+      final pixelRatio = (MediaQuery.maybeOf(context)?.devicePixelRatio ??
+              ui.window.devicePixelRatio) *
+          widget.captureScale;
       final image = await boundary.toImage(pixelRatio: pixelRatio);
       _lastImage?.dispose();
       _lastImage = image;
@@ -114,16 +126,19 @@ class _LiquidGlassScopeState extends State<LiquidGlassScope> with SingleTickerPr
 }
 
 class _LiquidGlassScopeInherited extends InheritedWidget {
-  const _LiquidGlassScopeInherited({required super.child, required this.controller});
+  const _LiquidGlassScopeInherited(
+      {required super.child, required this.controller});
 
   final LiquidGlassScopeController controller;
 
   @override
-  bool updateShouldNotify(covariant _LiquidGlassScopeInherited oldWidget) => controller != oldWidget.controller;
+  bool updateShouldNotify(covariant _LiquidGlassScopeInherited oldWidget) =>
+      controller != oldWidget.controller;
 }
 
 class LiquidGlassFrame {
-  LiquidGlassFrame({required this.image, required this.imageSize, required this.time});
+  LiquidGlassFrame(
+      {required this.image, required this.imageSize, required this.time});
 
   final ui.Image image;
   final Size imageSize;
@@ -131,15 +146,18 @@ class LiquidGlassFrame {
 }
 
 class LiquidGlassScopeController {
-  LiquidGlassScopeController._({required GlobalKey boundaryKey}) : _boundaryKey = boundaryKey;
+  LiquidGlassScopeController._({required GlobalKey boundaryKey})
+      : _boundaryKey = boundaryKey;
 
   final GlobalKey _boundaryKey;
-  final ValueNotifier<LiquidGlassFrame?> _frameNotifier = ValueNotifier<LiquidGlassFrame?>(null);
+  final ValueNotifier<LiquidGlassFrame?> _frameNotifier =
+      ValueNotifier<LiquidGlassFrame?>(null);
   ui.FragmentProgram? _program;
 
   ValueListenable<LiquidGlassFrame?> get frameListenable => _frameNotifier;
   ui.FragmentProgram? get program => _program;
-  RenderBox? get boundaryBox => _boundaryKey.currentContext?.findRenderObject() as RenderBox?;
+  RenderBox? get boundaryBox =>
+      _boundaryKey.currentContext?.findRenderObject() as RenderBox?;
 
   void _setProgram(ui.FragmentProgram program) {
     _program = program;

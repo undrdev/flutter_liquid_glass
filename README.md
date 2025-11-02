@@ -104,6 +104,8 @@ LiquidGlassContainer(
   ),
   edgeShine: true,
   edgeShineIntensity: 0.5,
+  refractionStrength: 0.028,
+  magnification: 1.012,
   child: YourWidget(),
 )
 ```
@@ -118,6 +120,8 @@ MaterialApp(
         blurIntensity: 15.0,
         tintColor: Colors.white,
         edgeShineIntensity: 0.3,
+        refractionStrength: 0.026,
+        magnification: 1.015,
       ),
     ],
   ),

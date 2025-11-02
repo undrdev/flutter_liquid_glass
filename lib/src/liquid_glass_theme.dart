@@ -39,6 +39,12 @@ class LiquidGlassTheme extends ThemeExtension<LiquidGlassTheme> {
   /// The default border radius.
   final BorderRadius borderRadius;
 
+  /// The default refraction strength for the shader lens.
+  final double refractionStrength;
+
+  /// The default magnification amount for the shader lens.
+  final double magnification;
+
   const LiquidGlassTheme({
     this.blurIntensity = 15.0,
     this.tintColor = const Color.fromRGBO(255, 255, 255, 0.1),
@@ -46,6 +52,8 @@ class LiquidGlassTheme extends ThemeExtension<LiquidGlassTheme> {
     this.edgeShineIntensity = 0.3,
     this.edgeShineColor = Colors.white,
     this.borderRadius = const BorderRadius.all(Radius.circular(20)),
+    this.refractionStrength = 0.03,
+    this.magnification = 1.018,
   });
 
   @override
@@ -56,6 +64,8 @@ class LiquidGlassTheme extends ThemeExtension<LiquidGlassTheme> {
     double? edgeShineIntensity,
     Color? edgeShineColor,
     BorderRadius? borderRadius,
+    double? refractionStrength,
+    double? magnification,
   }) {
     return LiquidGlassTheme(
       blurIntensity: blurIntensity ?? this.blurIntensity,
@@ -64,6 +74,8 @@ class LiquidGlassTheme extends ThemeExtension<LiquidGlassTheme> {
       edgeShineIntensity: edgeShineIntensity ?? this.edgeShineIntensity,
       edgeShineColor: edgeShineColor ?? this.edgeShineColor,
       borderRadius: borderRadius ?? this.borderRadius,
+      refractionStrength: refractionStrength ?? this.refractionStrength,
+      magnification: magnification ?? this.magnification,
     );
   }
 
@@ -88,6 +100,9 @@ class LiquidGlassTheme extends ThemeExtension<LiquidGlassTheme> {
           Color.lerp(edgeShineColor, other.edgeShineColor, t) ?? Colors.white,
       borderRadius: BorderRadius.lerp(borderRadius, other.borderRadius, t) ??
           const BorderRadius.all(Radius.circular(20)),
+      refractionStrength:
+          lerpDouble(refractionStrength, other.refractionStrength, t) ?? 0.03,
+      magnification: lerpDouble(magnification, other.magnification, t) ?? 1.018,
     );
   }
 }

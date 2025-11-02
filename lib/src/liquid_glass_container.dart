@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_liquid_glass/src/edge_shine_painter.dart';
+import 'package:flutter_liquid_glass/src/liquid_glass_theme.dart';
 
 import 'lens/liquid_glass_lens.dart';
 import 'lens/liquid_glass_scope.dart';
@@ -84,10 +85,10 @@ class LiquidGlassContainer extends StatelessWidget {
   final AlignmentGeometry? alignment;
 
   /// Refraction strength for the shader lens when available.
-  final double refractionStrength;
+  final double? refractionStrength;
 
   /// Magnification factor for the shader lens.
-  final double magnification;
+  final double? magnification;
 
   const LiquidGlassContainer({
     super.key,
@@ -110,14 +111,19 @@ class LiquidGlassContainer extends StatelessWidget {
     this.height,
     this.clipBehavior = Clip.antiAlias,
     this.alignment,
-    this.refractionStrength = 0.045,
-    this.magnification = 1.025,
+    this.refractionStrength,
+    this.magnification,
   });
 
   @override
   Widget build(BuildContext context) {
     final scopeController = LiquidGlassScope.maybeOf(context);
     final useLens = scopeController != null && scopeController.program != null;
+    final theme = context.liquidGlassTheme;
+    final effectiveRefraction =
+        refractionStrength ?? theme?.refractionStrength ?? 0.03;
+    final effectiveMagnification =
+        this.magnification ?? theme?.magnification ?? 1.018;
 
     Widget content = Container(
       width: width,
@@ -161,8 +167,8 @@ class LiquidGlassContainer extends StatelessWidget {
                   child: useLens
                       ? LiquidGlassLens(
                           borderRadius: borderRadius,
-                          refraction: refractionStrength,
-                          magnification: magnification,
+                          refraction: effectiveRefraction,
+                          magnification: effectiveMagnification,
                         )
                       : ClipRRect(
                           borderRadius: borderRadius,

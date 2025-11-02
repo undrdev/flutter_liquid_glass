@@ -311,14 +311,20 @@ void main() {
       const theme1 = LiquidGlassTheme(
         blurIntensity: 10.0,
         tintColor: Colors.red,
+        refractionStrength: 0.02,
+        magnification: 1.01,
       );
       const theme2 = LiquidGlassTheme(
         blurIntensity: 30.0,
         tintColor: Colors.blue,
+        refractionStrength: 0.06,
+        magnification: 1.03,
       );
 
       final lerped = theme1.lerp(theme2, 0.5);
       expect(lerped.blurIntensity, 20.0);
+      expect(lerped.refractionStrength, closeTo(0.04, 0.001));
+      expect(lerped.magnification, closeTo(1.02, 0.001));
     });
 
     testWidgets('copyWith creates new theme with changes',
@@ -326,14 +332,18 @@ void main() {
       const original = LiquidGlassTheme(
         blurIntensity: 15.0,
         tintColor: Colors.red,
+        refractionStrength: 0.025,
       );
 
       final updated = original.copyWith(
         blurIntensity: 25.0,
+        refractionStrength: 0.05,
       );
 
       expect(updated.blurIntensity, 25.0);
       expect(updated.tintColor, Colors.red);
+      expect(updated.refractionStrength, 0.05);
+      expect(original.refractionStrength, 0.025);
     });
   });
 

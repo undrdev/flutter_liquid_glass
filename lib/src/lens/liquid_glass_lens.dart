@@ -132,7 +132,8 @@ class _LiquidGlassLensPainter extends CustomPainter {
     shader.setFloat(8, magnification);
 
     final paint = Paint()..shader = shader;
-    final rrect = borderRadius.toRRect(Rect.fromLTWH(0, 0, size.width, size.height));
+    final rrect =
+        borderRadius.toRRect(Rect.fromLTWH(0, 0, size.width, size.height));
     canvas.drawRRect(rrect, paint);
     shader.dispose();
   }

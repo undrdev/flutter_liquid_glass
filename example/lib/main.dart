@@ -25,9 +25,7 @@ class MyApp extends StatelessWidget {
           ),
         ],
       ),
-      home: LiquidGlassScope(
-        child: const DemoHome(),
-      ),
+      home: LiquidGlassScope(child: const DemoHome()),
       debugShowCheckedModeBanner: false,
     );
   }
